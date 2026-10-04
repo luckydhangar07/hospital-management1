@@ -1,0 +1,1485 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HealthCare Plus - Indian Hospital Management System</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            200: '#99f6e4',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                            700: '#0f766e',
+                            800: '#115e59',
+                            900: '#134e4a',
+                        },
+                        saffron: {
+                            500: '#f97316',
+                            600: '#ea580c',
+                            700: '#c2410c'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .active-tab { background-color: #0d9488 !important; color: #ffffff !important; font-weight: 600; }
+        .glass-header { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); }
+        @media print {
+            body * { visibility: hidden; }
+            #printable-invoice-modal, #printable-invoice-modal * { visibility: visible; }
+            #printable-invoice-modal { position: absolute; left: 0; top: 0; width: 100%; }
+        }
+    </style>
+</head>
+<body class="h-full font-sans text-slate-800 bg-slate-50 flex flex-col md:flex-row antialiased overflow-x-hidden selection:bg-brand-600 selection:text-white">
+
+    <!-- SIDEBAR NAVIGATION -->
+    <aside id="sidebar" class="w-full md:w-64 bg-slate-900 text-slate-300 flex-shrink-0 flex flex-col justify-between border-r border-slate-800 z-40 transition-all duration-300">
+        <div>
+            <!-- Hospital Branding Header -->
+            <div class="p-4 border-b border-slate-800 flex items-center justify-between">
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('dashboard')">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-teal-400 flex items-center justify-center text-white font-extrabold text-xl shadow-lg shadow-brand-600/30">
+                        H+
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-white text-base leading-tight">HealthCare Plus</h1>
+                        <span class="text-[10px] text-amber-400 font-bold tracking-wider uppercase bg-amber-400/10 px-1.5 py-0.5 rounded border border-amber-400/20">NABH Accredited</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="p-3 space-y-1 text-xs font-medium">
+                <div class="px-3 py-2 text-[10px] uppercase font-bold text-slate-500 tracking-wider">Main Desk</div>
+                
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg active-tab transition">
+                    <i class="fa-solid fa-chart-pie text-sm w-5 text-center"></i>
+                    <span>Dashboard Overview</span>
+                </button>
+
+                <button onclick="switchTab('patients')" id="nav-patients" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg hover:bg-slate-800 hover:text-white transition">
+                    <i class="fa-solid fa-user-injured text-sm w-5 text-center"></i>
+                    <span>Patient Directory (OPD/IPD)</span>
+                </button>
+
+                <button onclick="switchTab('doctors')" id="nav-doctors" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg hover:bg-slate-800 hover:text-white transition">
+                    <i class="fa-solid fa-user-doctor text-sm w-5 text-center"></i>
+                    <span>Doctors & OPD Schedule</span>
+                </button>
+
+                <button onclick="switchTab('appointments')" id="nav-appointments" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg hover:bg-slate-800 hover:text-white transition">
+                    <i class="fa-solid fa-calendar-check text-sm w-5 text-center"></i>
+                    <span>Appointment Scheduler</span>
+                </button>
+
+                <div class="px-3 py-2 mt-4 text-[10px] uppercase font-bold text-slate-500 tracking-wider">Facilities & Billing</div>
+
+                <button onclick="switchTab('beds')" id="nav-beds" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg hover:bg-slate-800 hover:text-white transition">
+                    <i class="fa-solid fa-bed text-sm w-5 text-center"></i>
+                    <span>Bed & Ward Management</span>
+                </button>
+
+                <button onclick="switchTab('billing')" id="nav-billing" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg hover:bg-slate-800 hover:text-white transition">
+                    <i class="fa-solid fa-file-invoice-dollar text-sm w-5 text-center"></i>
+                    <span>GST Invoices & Payments</span>
+                </button>
+
+                <button onclick="switchTab('pharmacy')" id="nav-pharmacy" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg hover:bg-slate-800 hover:text-white transition">
+                    <i class="fa-solid fa-pills text-sm w-5 text-center"></i>
+                    <span>Pharmacy (Schedule H)</span>
+                </button>
+
+                <div class="px-3 py-2 mt-4 text-[10px] uppercase font-bold text-slate-500 tracking-wider">Govt Ecosystem</div>
+
+                <button onclick="switchTab('abha')" id="nav-abha" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg hover:bg-slate-800 hover:text-white transition">
+                    <i class="fa-solid fa-id-card text-sm w-5 text-center text-blue-400"></i>
+                    <span>ABHA & PM-JAY Scheme</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- Sidebar Footer -->
+        <div class="p-3 border-t border-slate-800 bg-slate-950/50">
+            <div class="flex items-center justify-between text-xs">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 rounded-full bg-brand-700 text-white font-bold flex items-center justify-center text-xs">
+                        RS
+                    </div>
+                    <div>
+                        <div class="font-bold text-white leading-none">Dr. R. Sharma</div>
+                        <div class="text-[10px] text-slate-400 mt-0.5">Medical Supt.</div>
+                    </div>
+                </div>
+                <span class="inline-block w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse" title="System Online"></span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <div class="flex-1 flex flex-col h-full overflow-y-auto">
+        
+        <!-- TOP HEADER BAR -->
+        <header class="glass-header sticky top-0 z-30 border-b border-slate-200 px-4 py-3 sm:px-6 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <h2 id="current-page-title" class="text-base sm:text-lg font-bold text-slate-900">Dashboard Overview</h2>
+                <span class="hidden sm:inline-block text-slate-300">|</span>
+                <span class="hidden sm:inline-block text-xs font-medium text-slate-500"><i class="fa-solid fa-building-columns text-saffron-500 mr-1"></i> GSTIN: 07AAAAA0000A1Z5</span>
+            </div>
+
+            <div class="flex items-center space-x-3">
+                <!-- Clock / Date Display -->
+                <div class="hidden md:flex flex-col text-right text-xs">
+                    <span id="live-time" class="font-bold text-slate-800 font-mono">--:--:--</span>
+                    <span id="live-date" class="text-[10px] text-slate-500">October 4, 2026</span>
+                </div>
+
+                <!-- Emergency Contact Badge -->
+                <div class="bg-red-50 border border-red-200 text-red-700 px-3 py-1.5 rounded-lg flex items-center space-x-1.5 text-xs font-semibold">
+                    <i class="fa-solid fa-phone-volume text-red-600 animate-bounce"></i>
+                    <span>108 / 011-26588500</span>
+                </div>
+
+                <!-- Primary Action Button -->
+                <button onclick="openNewPatientModal()" class="bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs px-3.5 py-2 rounded-lg shadow-sm transition flex items-center space-x-1">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>New Admission</span>
+                </button>
+            </div>
+        </header>
+
+        <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6">
+
+            <!-- 1. DASHBOARD TAB VIEW -->
+            <section id="view-dashboard" class="tab-view space-y-6">
+                <!-- Welcome Banner -->
+                <div class="bg-gradient-to-r from-slate-900 via-brand-900 to-teal-900 text-white rounded-2xl p-6 shadow-xl relative overflow-hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div class="space-y-1.5 z-10">
+                        <div class="flex items-center space-x-2">
+                            <span class="bg-brand-500/30 text-brand-200 border border-brand-400/30 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">Ayushman ABDM M3 Ready</span>
+                            <span class="text-xs text-brand-200"><i class="fa-solid fa-location-dot mr-1"></i> New Delhi Facility</span>
+                        </div>
+                        <h2 class="text-xl sm:text-2xl font-extrabold">HealthCare Plus Hospital Command Center</h2>
+                        <p class="text-xs sm:text-sm text-slate-300 max-w-2xl">Integrated Multispecialty Electronic Medical Records, PM-JAY Settlement, GST Billing & Ward Monitoring.</p>
+                    </div>
+                    <div class="flex items-center space-x-2 z-10">
+                        <button onclick="switchTab('patients')" class="bg-white text-slate-900 font-bold text-xs px-4 py-2.5 rounded-xl hover:bg-brand-50 transition shadow">
+                            <i class="fa-solid fa-user-plus text-brand-600 mr-1.5"></i> Register Patient
+                        </button>
+                        <button onclick="switchTab('billing')" class="bg-saffron-500 hover:bg-saffron-600 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition shadow">
+                            <i class="fa-solid fa-receipt mr-1.5"></i> Quick Bill
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Key Metrics Grid -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200/80 shadow-sm space-y-2">
+                        <div class="flex justify-between items-center text-slate-500 text-xs font-semibold">
+                            <span>Today's OPD Count</span>
+                            <div class="w-8 h-8 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center"><i class="fa-solid fa-stethoscope text-sm"></i></div>
+                        </div>
+                        <div class="text-2xl font-extrabold text-slate-900" id="dash-stat-opd">142</div>
+                        <div class="text-[11px] text-emerald-600 font-bold flex items-center"><i class="fa-solid fa-arrow-trend-up mr-1"></i> +14% vs yesterday</div>
+                    </div>
+
+                    <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200/80 shadow-sm space-y-2">
+                        <div class="flex justify-between items-center text-slate-500 text-xs font-semibold">
+                            <span>Inpatient Bed Status</span>
+                            <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center"><i class="fa-solid fa-bed text-sm"></i></div>
+                        </div>
+                        <div class="text-2xl font-extrabold text-slate-900" id="dash-stat-beds">38 / 50</div>
+                        <div class="text-[11px] text-amber-600 font-bold">12 Beds Available</div>
+                    </div>
+
+                    <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200/80 shadow-sm space-y-2">
+                        <div class="flex justify-between items-center text-slate-500 text-xs font-semibold">
+                            <span>Today's Billing (INR)</span>
+                            <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center"><i class="fa-solid fa-indian-rupee-sign text-sm"></i></div>
+                        </div>
+                        <div class="text-2xl font-extrabold text-slate-900" id="dash-stat-revenue">₹ 3,42,850</div>
+                        <div class="text-[11px] text-emerald-600 font-bold">Includes GST + Insurance</div>
+                    </div>
+
+                    <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200/80 shadow-sm space-y-2">
+                        <div class="flex justify-between items-center text-slate-500 text-xs font-semibold">
+                            <span>PM-JAY Active Claims</span>
+                            <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center"><i class="fa-solid fa-shield-halved text-sm"></i></div>
+                        </div>
+                        <div class="text-2xl font-extrabold text-slate-900" id="dash-stat-pmjay">18 Claims</div>
+                        <div class="text-[11px] text-blue-600 font-bold">₹ 5.2 Lakh Sanctioned</div>
+                    </div>
+                </div>
+
+                <!-- Split Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Recent OPD / Admissions -->
+                    <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200/80 shadow-sm p-5 space-y-4">
+                        <div class="flex justify-between items-center border-b pb-3 border-slate-100">
+                            <h3 class="font-bold text-slate-900 text-sm flex items-center">
+                                <i class="fa-solid fa-clock-rotate-left text-brand-600 mr-2"></i> Live Patient Admission Feed
+                            </h3>
+                            <button onclick="switchTab('patients')" class="text-xs text-brand-700 font-bold hover:underline">View All Patients →</button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs text-slate-600">
+                                <thead class="bg-slate-50 text-slate-500 uppercase font-semibold text-[10px]">
+                                    <tr>
+                                        <th class="p-2.5">UHID / ABHA</th>
+                                        <th class="p-2.5">Patient Name</th>
+                                        <th class="p-2.5">Department</th>
+                                        <th class="p-2.5">Attending Doctor</th>
+                                        <th class="p-2.5 text-right">Type</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dash-patient-list" class="divide-y divide-slate-100">
+                                    <!-- Populated via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Ward & Bed Summary Card -->
+                    <div class="bg-white rounded-xl border border-slate-200/80 shadow-sm p-5 space-y-4">
+                        <div class="flex justify-between items-center border-b pb-3 border-slate-100">
+                            <h3 class="font-bold text-slate-900 text-sm flex items-center">
+                                <i class="fa-solid fa-bed-pulse text-amber-500 mr-2"></i> Ward Occupancy Summary
+                            </h3>
+                            <button onclick="switchTab('beds')" class="text-xs text-brand-700 font-bold hover:underline">Ward Map →</button>
+                        </div>
+                        <div class="space-y-3" id="dash-ward-breakdown">
+                            <!-- Populated via JS -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. PATIENT MANAGEMENT TAB VIEW -->
+            <section id="view-patients" class="tab-view space-y-6 hidden">
+                <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200/80 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-900">OPD & IPD Patient Directory</h3>
+                        <p class="text-xs text-slate-500">Centralized Electronic Health Records (EHR), ABHA Linking, and Admission Logs.</p>
+                    </div>
+                    <button onclick="openNewPatientModal()" class="bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold px-4 py-2.5 rounded-lg transition shadow-sm flex items-center space-x-1.5">
+                        <i class="fa-solid fa-user-plus"></i>
+                        <span>Register New Patient</span>
+                    </button>
+                </div>
+
+                <!-- Filters -->
+                <div class="bg-white p-4 rounded-xl border border-slate-200/80 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <input type="text" id="patient-search-input" onkeyup="renderPatientsTable()" placeholder="Search Name, UHID, Mobile +91, ABHA..." class="text-xs px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-brand-500">
+                    <select id="patient-filter-dept" onchange="renderPatientsTable()" class="text-xs px-3 py-2 border border-slate-300 rounded-lg focus:outline-none">
+                        <option value="">All Departments</option>
+                        <option value="General Medicine">General Medicine</option>
+                        <option value="Cardiology">Cardiology</option>
+                        <option value="Orthopedics">Orthopedics</option>
+                        <option value="Pediatrics">Pediatrics</option>
+                        <option value="Gynecology & Obstetrics">Gynecology & Obstetrics</option>
+                        <option value="Neurology">Neurology</option>
+                    </select>
+                    <select id="patient-filter-type" onchange="renderPatientsTable()" class="text-xs px-3 py-2 border border-slate-300 rounded-lg focus:outline-none">
+                        <option value="">All Admission Types</option>
+                        <option value="OPD">OPD Consultation</option>
+                        <option value="IPD">IPD Admission</option>
+                        <option value="Emergency">Emergency</option>
+                    </select>
+                </div>
+
+                <!-- Patient Table -->
+                <div class="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs text-slate-600">
+                            <thead class="bg-slate-50 text-slate-500 uppercase font-semibold text-[10px] border-b border-slate-200">
+                                <tr>
+                                    <th class="p-3">UHID / Date</th>
+                                    <th class="p-3">Patient Details</th>
+                                    <th class="p-3">Department & Doctor</th>
+                                    <th class="p-3">Govt Scheme / ABHA ID</th>
+                                    <th class="p-3">Assigned Ward</th>
+                                    <th class="p-3 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="patients-table-body" class="divide-y divide-slate-100">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. DOCTORS & OPD TAB VIEW -->
+            <section id="view-doctors" class="tab-view space-y-6 hidden">
+                <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200/80 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-900">Medical Specialists & OPD Schedule</h3>
+                        <p class="text-xs text-slate-500">View doctor availability, medical council registration numbers, and OPD consultation fees.</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <select id="doctor-dept-filter" onchange="renderDoctorsGrid()" class="text-xs px-3 py-2 border border-slate-300 rounded-lg">
+                            <option value="">All Departments</option>
+                            <option value="General Medicine">General Medicine</option>
+                            <option value="Cardiology">Cardiology</option>
+                            <option value="Orthopedics">Orthopedics</option>
+                            <option value="Pediatrics">Pediatrics</option>
+                            <option value="Neurology">Neurology</option>
+                            <option value="Gynecology & Obstetrics">Gynecology & Obstetrics</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Doctors Grid -->
+                <div id="doctors-grid-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Populated dynamically -->
+                </div>
+            </section>
+
+            <!-- 4. APPOINTMENT SCHEDULER TAB VIEW -->
+            <section id="view-appointments" class="tab-view space-y-6 hidden">
+                <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200/80 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-900">OPD Appointment Scheduler</h3>
+                        <p class="text-xs text-slate-500">Book, reschedule, and manage doctor consultation appointments.</p>
+                    </div>
+                    <button onclick="openBookAppointmentModal()" class="bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold px-4 py-2.5 rounded-lg transition shadow-sm flex items-center space-x-1.5">
+                        <i class="fa-solid fa-calendar-plus"></i>
+                        <span>Book Appointment</span>
+                    </button>
+                </div>
+
+                <!-- Appointments Table -->
+                <div class="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs text-slate-600">
+                            <thead class="bg-slate-50 text-slate-500 uppercase font-semibold text-[10px] border-b border-slate-200">
+                                <tr>
+                                    <th class="p-3">Appointment ID</th>
+                                    <th class="p-3">Patient Name</th>
+                                    <th class="p-3">Doctor & Department</th>
+                                    <th class="p-3">Date & Slot</th>
+                                    <th class="p-3">Fee (₹)</th>
+                                    <th class="p-3">Status</th>
+                                    <th class="p-3 text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="appointments-table-body" class="divide-y divide-slate-100">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. BED & WARD MANAGEMENT TAB VIEW -->
+            <section id="view-beds" class="tab-view space-y-6 hidden">
+                <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200/80 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-900">Bed & Ward Visualizer</h3>
+                        <p class="text-xs text-slate-500">Real-time bed allocation for ICU, Emergency, Male/Female Wards, and Deluxe Suites.</p>
+                    </div>
+                    <div class="flex items-center space-x-4 text-xs font-medium">
+                        <span class="flex items-center"><span class="w-3 h-3 bg-emerald-500 rounded-full mr-1.5"></span> Available</span>
+                        <span class="flex items-center"><span class="w-3 h-3 bg-rose-500 rounded-full mr-1.5"></span> Occupied</span>
+                        <span class="flex items-center"><span class="w-3 h-3 bg-amber-500 rounded-full mr-1.5"></span> Maintenance</span>
+                    </div>
+                </div>
+
+                <!-- Ward Visualizer Grid -->
+                <div id="ward-grid-container" class="space-y-6">
+                    <!-- Populated dynamically -->
+                </div>
+            </section>
+
+            <!-- 6. BILLING & INVOICES TAB VIEW -->
+            <section id="view-billing" class="tab-view space-y-6 hidden">
+                <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200/80 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-900">GST Billing & Tax Invoice Counter</h3>
+                        <p class="text-xs text-slate-500">18% GST Compliant billing with CGST/SGST/IGST breakdown and UPI checkout.</p>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Billing Desk #02</span>
+                        <span class="text-xs font-bold text-slate-800">Operator: Amit Sharma</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Billing Builder -->
+                    <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200/80 shadow-sm p-5 space-y-4">
+                        <div class="flex justify-between items-center border-b pb-3">
+                            <h4 class="font-bold text-slate-900 text-sm">Select Patient & Add Medical Services</h4>
+                            <span class="text-xs font-mono bg-slate-100 text-slate-700 px-2.5 py-1 rounded-lg">INV-2026/0942</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                            <div>
+                                <label class="block font-semibold text-slate-700 mb-1">Patient UHID *</label>
+                                <select id="billing-patient-select" onchange="onBillingPatientChange()" class="w-full p-2 border border-slate-300 rounded-lg">
+                                    <!-- Populated dynamically -->
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block font-semibold text-slate-700 mb-1">GST Tax Type</label>
+                                <select id="billing-gst-type" onchange="calculateBillingTotals()" class="w-full p-2 border border-slate-300 rounded-lg">
+                                    <option value="INTRA">Intra-State Delhi (CGST 9% + SGST 9%)</option>
+                                    <option value="INTER">Inter-State (IGST 18%)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Services Line Table -->
+                        <div class="border rounded-lg overflow-hidden">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-slate-50 font-semibold text-slate-500 border-b">
+                                    <tr>
+                                        <th class="p-2.5">Particulars / Medical Charge</th>
+                                        <th class="p-2.5">SAC/HSN Code</th>
+                                        <th class="p-2.5 text-center">Qty</th>
+                                        <th class="p-2.5 text-right">Rate (₹)</th>
+                                        <th class="p-2.5 text-right">Amount (₹)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="billing-items-body" class="divide-y divide-slate-100">
+                                    <!-- Populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <button onclick="addBillingLineItem()" class="text-xs text-brand-700 font-bold hover:underline flex items-center">
+                            <i class="fa-solid fa-plus-circle mr-1"></i> Add Custom Charge Line Item
+                        </button>
+                    </div>
+
+                    <!-- Payment Summary Box -->
+                    <div class="bg-white rounded-xl border border-slate-200/80 shadow-sm p-5 space-y-4 flex flex-col justify-between">
+                        <div class="space-y-4">
+                            <h4 class="font-bold text-slate-900 text-sm border-b pb-2">Tax Calculation (INR)</h4>
+                            
+                            <div class="space-y-2 text-xs">
+                                <div class="flex justify-between text-slate-600">
+                                    <span>Sub Total (Excl. Tax):</span>
+                                    <span font-mono id="bill-subtotal">₹ 0.00</span>
+                                </div>
+                                <div class="flex justify-between text-slate-600">
+                                    <span id="bill-cgst-label">CGST (9%):</span>
+                                    <span font-mono id="bill-cgst">₹ 0.00</span>
+                                </div>
+                                <div class="flex justify-between text-slate-600">
+                                    <span id="bill-sgst-label">SGST (9%):</span>
+                                    <span font-mono id="bill-sgst">₹ 0.00</span>
+                                </div>
+                                <div class="flex justify-between text-slate-600">
+                                    <span>PM-JAY Scheme Subsidy:</span>
+                                    <span font-mono id="bill-subsidy" class="text-emerald-600 font-bold">- ₹ 0.00</span>
+                                </div>
+                                <div class="flex justify-between text-sm font-bold text-slate-900 pt-2 border-t border-slate-200">
+                                    <span>Grand Total Payable:</span>
+                                    <span font-mono id="bill-grandtotal" class="text-brand-700 text-base">₹ 0.00</span>
+                                </div>
+                            </div>
+
+                            <div class="space-y-2 pt-2">
+                                <label class="block text-xs font-bold text-slate-700">Indian Payment Gateway Mode</label>
+                                <div class="grid grid-cols-2 gap-2 text-xs">
+                                    <button onclick="setPaymentMode('UPI')" id="paybtn-upi" class="pay-btn p-2.5 border border-brand-500 bg-brand-50 text-brand-700 font-bold rounded-lg flex items-center justify-center space-x-1">
+                                        <i class="fa-solid fa-qrcode"></i> <span>UPI / GPay</span>
+                                    </button>
+                                    <button onclick="setPaymentMode('RuPay')" id="paybtn-rupay" class="pay-btn p-2.5 border border-slate-200 text-slate-600 font-medium rounded-lg flex items-center justify-center space-x-1 hover:bg-slate-50">
+                                        <i class="fa-solid fa-credit-card"></i> <span>RuPay / Card</span>
+                                    </button>
+                                    <button onclick="setPaymentMode('Netbanking')" id="paybtn-netbanking" class="pay-btn p-2.5 border border-slate-200 text-slate-600 font-medium rounded-lg flex items-center justify-center space-x-1 hover:bg-slate-50">
+                                        <i class="fa-solid fa-building-columns"></i> <span>NetBanking</span>
+                                    </button>
+                                    <button onclick="setPaymentMode('Cash')" id="paybtn-cash" class="pay-btn p-2.5 border border-slate-200 text-slate-600 font-medium rounded-lg flex items-center justify-center space-x-1 hover:bg-slate-50">
+                                        <i class="fa-solid fa-money-bill-wave"></i> <span>Cash Counter</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2 pt-4">
+                            <button onclick="processInvoicePayment()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg text-xs shadow transition flex items-center justify-center space-x-2">
+                                <i class="fa-solid fa-lock"></i>
+                                <span>Collect Payment & Generate GST Invoice</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 7. PHARMACY TAB VIEW -->
+            <section id="view-pharmacy" class="tab-view space-y-6 hidden">
+                <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200/80 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-900">In-House Pharmacy & Drug Inventory</h3>
+                        <p class="text-xs text-slate-500">Track Schedule H/H1 prescription compliance, expiry dates, and batch numbers.</p>
+                    </div>
+                    <button onclick="openDispenseMedModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2.5 rounded-lg transition shadow-sm flex items-center space-x-1.5">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                        <span>Dispense Medicine</span>
+                    </button>
+                </div>
+
+                <!-- Schedule H Warning Banner -->
+                <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-xl text-xs text-amber-900 flex items-start space-x-3">
+                    <i class="fa-solid fa-triangle-exclamation text-amber-600 text-base mt-0.5"></i>
+                    <div>
+                        <span class="font-bold">Schedule H / H1 Statutory Warning (Drugs & Cosmetics Rules, India):</span>
+                        <p class="mt-0.5">Medicines categorized under <span class="bg-red-100 text-red-800 font-bold px-1 rounded">Schedule H / H1</span> must be dispensed strictly against a registered medical practitioner's prescription. Batch numbers must be recorded for drug inspector audits.</p>
+                    </div>
+                </div>
+
+                <!-- Inventory Table -->
+                <div class="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs text-slate-600">
+                            <thead class="bg-slate-50 text-slate-500 uppercase font-semibold text-[10px] border-b border-slate-200">
+                                <tr>
+                                    <th class="p-3">Medicine Brand & Generic</th>
+                                    <th class="p-3">Category / Schedule</th>
+                                    <th class="p-3">Batch & Expiry</th>
+                                    <th class="p-3">Available Stock</th>
+                                    <th class="p-3">Unit Price (₹)</th>
+                                    <th class="p-3">GST %</th>
+                                    <th class="p-3 text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pharmacy-table-body" class="divide-y divide-slate-100">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 8. ABHA & PM-JAY SCHEME CENTER TAB VIEW -->
+            <section id="view-abha" class="tab-view space-y-6 hidden">
+                <div class="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white rounded-2xl p-6 shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div class="space-y-1">
+                        <div class="flex items-center space-x-2">
+                            <span class="bg-blue-500/30 text-blue-200 border border-blue-400/30 text-xs px-2.5 py-0.5 rounded-full font-bold">NHA ABDM Sandbox Gateway</span>
+                        </div>
+                        <h2 class="text-xl sm:text-2xl font-extrabold">National Health Authority (NHA) Ecosystem</h2>
+                        <p class="text-xs text-blue-200">Verify 14-digit ABHA numbers, fetch EHR health records, and process Ayushman Bharat (PM-JAY) pre-authorizations.</p>
+                    </div>
+                    <div class="bg-white/10 p-3 rounded-xl border border-white/20 text-center">
+                        <span class="text-[10px] text-blue-200 uppercase font-bold block">Health Facility ID (HPR)</span>
+                        <span class="text-sm font-mono font-bold tracking-wider">IN3510002819</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- ABHA Verification Widget -->
+                    <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-sm space-y-4">
+                        <h4 class="font-bold text-slate-900 text-sm flex items-center border-b pb-2">
+                            <i class="fa-solid fa-id-card text-blue-600 mr-2"></i> ABHA ID (Ayushman Bharat Health Account) Verification
+                        </h4>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Enter 14-Digit ABHA ID or Aadhaar Linked Mobile</label>
+                                <div class="flex gap-2">
+                                    <input type="text" id="abha-verify-input" placeholder="e.g. 91-8273-9182-1209" class="flex-1 text-xs px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500">
+                                    <button onclick="verifyABHANumber()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition">
+                                        Verify ABHA
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="abha-result-box" class="hidden p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2 text-xs">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PM-JAY Pre-Auth Box -->
+                    <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-sm space-y-4">
+                        <h4 class="font-bold text-slate-900 text-sm flex items-center border-b pb-2">
+                            <i class="fa-solid fa-shield-cat text-saffron-500 mr-2"></i> PM-JAY Cashless Package Pre-Authorization
+                        </h4>
+                        <div class="space-y-3 text-xs">
+                            <div>
+                                <label class="block font-semibold text-slate-600 mb-1">Select Patient</label>
+                                <select id="pmjay-patient-select" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg">
+                                    <!-- Populated dynamically -->
+                                </select>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block font-semibold text-slate-600 mb-1">Scheme Package Code</label>
+                                    <input type="text" id="pmjay-pkg-code" value="MED-CARD-02 (PCI Stenting)" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg bg-slate-50">
+                                </div>
+                                <div>
+                                    <label class="block font-semibold text-slate-600 mb-1">Requested Amount (₹)</label>
+                                    <input type="number" id="pmjay-req-amt" value="125000" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg">
+                                </div>
+                            </div>
+                            <button onclick="submitPMJAYPreAuth()" class="w-full bg-saffron-500 hover:bg-saffron-600 text-white text-xs font-bold py-2.5 rounded-lg transition shadow">
+                                Submit Cashless Pre-Auth to NHA Portal
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- MODAL 1: NEW PATIENT REGISTRATION -->
+    <div id="modal-patient-reg" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-100 p-6 space-y-4">
+            <div class="flex justify-between items-center border-b pb-3">
+                <div>
+                    <h3 class="text-base font-bold text-slate-900">New Patient Registration & Admission</h3>
+                    <p class="text-xs text-slate-500">Centralized UHID Generation and Ward Allocation</p>
+                </div>
+                <button onclick="closeModal('modal-patient-reg')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <form onsubmit="handlePatientFormSubmit(event)" class="space-y-4 text-xs">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Full Patient Name *</label>
+                        <input type="text" id="reg-name" required placeholder="e.g. Ramesh Kumar Verma" class="w-full p-2 border border-slate-300 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Indian Mobile (+91) *</label>
+                        <input type="tel" id="reg-mobile" required pattern="[0-9]{10}" placeholder="9876543210" class="w-full p-2 border border-slate-300 rounded-lg">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-3">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Age *</label>
+                        <input type="number" id="reg-age" required min="0" max="120" placeholder="45" class="w-full p-2 border border-slate-300 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Gender *</label>
+                        <select id="reg-gender" class="w-full p-2 border border-slate-300 rounded-lg">
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Blood Group</label>
+                        <select id="reg-blood" class="w-full p-2 border border-slate-300 rounded-lg">
+                            <option value="B+">B+</option>
+                            <option value="O+">O+</option>
+                            <option value="A+">A+</option>
+                            <option value="AB+">AB+</option>
+                            <option value="O-">O-</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Admission Type *</label>
+                        <select id="reg-type" onchange="toggleBedSelectorInReg()" class="w-full p-2 border border-slate-300 rounded-lg">
+                            <option value="OPD">OPD Consultation</option>
+                            <option value="IPD">IPD Admission</option>
+                            <option value="Emergency">Emergency</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Department *</label>
+                        <select id="reg-dept" onchange="updateRegDoctorOptions()" class="w-full p-2 border border-slate-300 rounded-lg">
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Attending Doctor *</label>
+                        <select id="reg-doctor" class="w-full p-2 border border-slate-300 rounded-lg">
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Scheme / Insurance</label>
+                        <select id="reg-scheme" class="w-full p-2 border border-slate-300 rounded-lg">
+                            <option value="Self Paying">Self Paying</option>
+                            <option value="PM-JAY Ayushman Bharat">PM-JAY Ayushman Bharat</option>
+                            <option value="CGHS">CGHS (Central Govt)</option>
+                            <option value="ECHS">ECHS (Defence Panel)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">14-Digit ABHA ID (Optional)</label>
+                        <input type="text" id="reg-abha" placeholder="12-3456-7890-1234" class="w-full p-2 border border-slate-300 rounded-lg">
+                    </div>
+                    <div id="reg-bed-container" class="hidden">
+                        <label class="block font-semibold text-slate-700 mb-1">Assign IPD Bed Ward *</label>
+                        <select id="reg-bed" class="w-full p-2 border border-slate-300 rounded-lg bg-amber-50">
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+                </div>
+
+                <div class="pt-3 border-t flex justify-end space-x-2">
+                    <button type="button" onclick="closeModal('modal-patient-reg')" class="px-4 py-2 border rounded-lg text-slate-600 font-semibold hover:bg-slate-50">Cancel</button>
+                    <button type="submit" class="px-5 py-2 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-lg shadow">Register Patient & Issue Slip</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 2: BOOK APPOINTMENT -->
+    <div id="modal-book-app" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-slate-100 text-xs">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-base font-bold text-slate-900">Schedule OPD Consultation</h3>
+                <button onclick="closeModal('modal-book-app')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <form onsubmit="handleAppointmentSubmit(event)" class="space-y-3">
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Select Patient</label>
+                    <select id="app-patient" class="w-full p-2 border border-slate-300 rounded-lg">
+                        <!-- Populated dynamically -->
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Select Doctor</label>
+                    <select id="app-doctor" class="w-full p-2 border border-slate-300 rounded-lg">
+                        <!-- Populated dynamically -->
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Appointment Date</label>
+                        <input type="date" id="app-date" required class="w-full p-2 border border-slate-300 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Time Slot</label>
+                        <select id="app-slot" class="w-full p-2 border border-slate-300 rounded-lg">
+                            <option value="10:00 AM">10:00 AM</option>
+                            <option value="11:30 AM">11:30 AM</option>
+                            <option value="02:00 PM">02:00 PM</option>
+                            <option value="04:30 PM">04:30 PM</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="pt-3 border-t flex justify-end space-x-2">
+                    <button type="button" onclick="closeModal('modal-book-app')" class="px-4 py-2 border rounded-lg text-slate-600 font-semibold">Cancel</button>
+                    <button type="submit" class="px-5 py-2 bg-brand-600 text-white font-bold rounded-lg shadow">Confirm OPD Booking</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 3: UPI / PAYMENT MODAL -->
+    <div id="modal-upi-qr" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 text-center space-y-4 shadow-2xl border border-slate-100">
+            <div class="flex justify-between items-center border-b pb-2">
+                <span class="text-xs font-bold text-slate-500 uppercase">UPI Checkout Counter</span>
+                <button onclick="closeModal('modal-upi-qr')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div>
+                <span class="text-xs text-slate-500 block">Scan with PhonePe, Google Pay, BHIM, or Paytm</span>
+                <div class="text-2xl font-extrabold text-slate-900 mt-1" id="upi-modal-amount">₹ 0.00</div>
+            </div>
+
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 inline-block">
+                <svg class="w-44 h-44 mx-auto" viewBox="0 0 100 100" fill="none">
+                    <rect width="100" height="100" fill="white"/>
+                    <path d="M0 0h30v30H0zM10 10h10v10H10zM70 0h30v30H70zM80 10h10v10H80zM0 70h30v30H0zM10 80h10v10H10z" fill="#0f172a"/>
+                    <path d="M40 10h20v10H40zM40 30h10v20H40zM60 40h30v10H60zM20 40h10v20H20zM50 70h20v20H50zM80 70h10v20H80z" fill="#0d9488"/>
+                    <circle cx="50" cy="50" r="7" fill="#f97316"/>
+                </svg>
+            </div>
+
+            <p class="text-[11px] text-slate-400 font-mono">VPA: healthcareplus@icici</p>
+
+            <button onclick="confirmUPIPaymentSuccess()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg text-xs shadow transition">
+                <i class="fa-solid fa-circle-check mr-1"></i> Confirm Payment Received
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL 4: PRINTABLE TAX INVOICE -->
+    <div id="printable-invoice-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-100 p-6 space-y-4 text-xs">
+            <div class="flex justify-between items-start border-b pb-4">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-900">HealthCare Plus Hospital & Research Center</h2>
+                    <p class="text-[11px] text-slate-500">12, Sri Aurobindo Marg, Green Park, New Delhi - 110016</p>
+                    <p class="text-[11px] text-slate-500">GSTIN: 07AAAAA0000A1Z5 • Phone: 011-26588500</p>
+                </div>
+                <div class="text-right">
+                    <span class="bg-emerald-100 text-emerald-800 font-bold px-2.5 py-1 rounded text-[10px] uppercase tracking-wider">TAX INVOICE</span>
+                    <div id="invoice-modal-no" class="font-mono font-bold text-slate-700 mt-1">INV-2026/0942</div>
+                </div>
+            </div>
+
+            <div id="invoice-modal-content">
+                <!-- Dynamically Populated Invoice HTML -->
+            </div>
+
+            <div class="pt-4 border-t flex justify-end space-x-2">
+                <button onclick="closeModal('printable-invoice-modal')" class="px-4 py-2 border rounded-lg text-slate-600 font-semibold">Close</button>
+                <button onclick="window.print()" class="px-5 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-lg shadow flex items-center">
+                    <i class="fa-solid fa-print mr-1.5"></i> Print Official Bill
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // GLOBAL DATA MODELS
+        const DEPARTMENTS = [
+            { id: 'gen_med', name: 'General Medicine', doctors: ['Dr. Rajesh Sharma (MD)', 'Dr. Sunita Rao (MBBS)'] },
+            { id: 'cardio', name: 'Cardiology', doctors: ['Dr. Vikramaditya Sen (DM Cardio)', 'Dr. Ananya Goel (MCh)'] },
+            { id: 'ortho', name: 'Orthopedics', doctors: ['Dr. Harpreet Singh (MS Ortho)'] },
+            { id: 'peds', name: 'Pediatrics', doctors: ['Dr. Meenakshi Sundaram (MD Peds)'] },
+            { id: 'gyna', name: 'Gynecology & Obstetrics', doctors: ['Dr. Priya Mukherjee (MD Gyna)'] },
+            { id: 'neuro', name: 'Neurology', doctors: ['Dr. Alok Verma (DM Neuro)'] }
+        ];
+
+        let state = {
+            patients: [
+                { id: 'UHID-9081', name: 'Aarav Patel', age: 52, gender: 'Male', blood: 'B+', mobile: '9823019283', dept: 'Cardiology', doctor: 'Dr. Vikramaditya Sen (DM Cardio)', type: 'IPD', scheme: 'PM-JAY Ayushman Bharat', abha: '91-8273-9182-1209', bed: 'ICU-Bed 02', date: '2026-10-04' },
+                { id: 'UHID-9082', name: 'Sunita Sharma', age: 34, gender: 'Female', blood: 'O+', mobile: '9811223344', dept: 'General Medicine', doctor: 'Dr. Rajesh Sharma (MD)', type: 'OPD', scheme: 'Self Paying', abha: '33-1122-3344-5566', bed: '-', date: '2026-10-04' },
+                { id: 'UHID-9083', name: 'Gurpreet Kaur', age: 61, gender: 'Female', blood: 'A+', mobile: '9988776655', dept: 'Orthopedics', doctor: 'Dr. Harpreet Singh (MS Ortho)', type: 'IPD', scheme: 'CGHS', abha: '12-9988-7766-5544', bed: 'Deluxe-301', date: '2026-10-03' }
+            ],
+            doctors: [
+                { name: 'Dr. Rajesh Sharma', qual: 'MD (Internal Med) - AIIMS', reg: 'DMC/2012/8912', dept: 'General Medicine', fee: 800, available: true },
+                { name: 'Dr. Vikramaditya Sen', qual: 'DM (Cardiology) - PGI', reg: 'DMC/2008/4512', dept: 'Cardiology', fee: 1500, available: true },
+                { name: 'Dr. Harpreet Singh', qual: 'MS (Ortho) - Safdarjung', reg: 'DMC/2015/1092', dept: 'Orthopedics', fee: 1000, available: false },
+                { name: 'Dr. Meenakshi Sundaram', qual: 'MD (Pediatrics) - JIPMER', reg: 'DMC/2018/6631', dept: 'Pediatrics', fee: 700, available: true },
+                { name: 'Dr. Priya Mukherjee', qual: 'MD (Gynecology) - KGMU', reg: 'DMC/2014/3391', dept: 'Gynecology & Obstetrics', fee: 900, available: true },
+                { name: 'Dr. Alok Verma', qual: 'DM (Neurology) - NIMHANS', reg: 'DMC/2011/7721', dept: 'Neurology', fee: 1800, available: true }
+            ],
+            appointments: [
+                { id: 'APP-101', patient: 'Sunita Sharma', doctor: 'Dr. Rajesh Sharma (MD)', dept: 'General Medicine', date: '2026-10-04', slot: '10:00 AM', fee: 800, status: 'Scheduled' },
+                { id: 'APP-102', patient: 'Aarav Patel', doctor: 'Dr. Vikramaditya Sen (DM Cardio)', dept: 'Cardiology', date: '2026-10-04', slot: '11:30 AM', fee: 1500, status: 'Completed' }
+            ],
+            beds: [
+                { id: 'ICU-Bed 01', ward: 'ICU Ward', status: 'occupied', patient: 'Deepak Joshi' },
+                { id: 'ICU-Bed 02', ward: 'ICU Ward', status: 'occupied', patient: 'Aarav Patel' },
+                { id: 'ICU-Bed 03', ward: 'ICU Ward', status: 'available', patient: null },
+                { id: 'ICU-Bed 04', ward: 'ICU Ward', status: 'maintenance', patient: null },
+                { id: 'General-101', ward: 'Male General Ward', status: 'available', patient: null },
+                { id: 'General-102', ward: 'Male General Ward', status: 'available', patient: null },
+                { id: 'General-103', ward: 'Male General Ward', status: 'occupied', patient: 'Karan Malhotra' },
+                { id: 'Deluxe-301', ward: 'Private Deluxe Suite', status: 'occupied', patient: 'Gurpreet Kaur' },
+                { id: 'Deluxe-302', ward: 'Private Deluxe Suite', status: 'available', patient: null }
+            ],
+            medicines: [
+                { id: 'MED-101', name: 'Augmentin 625mg', generic: 'Amoxicillin + Clavulanic Acid', category: 'Antibiotic', schedule: 'Schedule H', stock: 120, price: 201.50, gst: 12, batch: 'B24-098', exp: '2027-05' },
+                { id: 'MED-102', name: 'Alprazolam 0.25mg', generic: 'Alprazolam', category: 'Anxiolytic', schedule: 'Schedule H1', stock: 15, price: 45.00, gst: 12, batch: 'B24-112', exp: '2026-12' },
+                { id: 'MED-103', name: 'Paracetamol 650mg (Dolo)', generic: 'Paracetamol', category: 'Antipyretic', schedule: 'OTC General', stock: 500, price: 30.00, gst: 12, batch: 'B25-001', exp: '2028-01' },
+                { id: 'MED-104', name: 'Pantocid 40mg', generic: 'Pantoprazole', category: 'Antacid', schedule: 'OTC General', stock: 240, price: 110.00, gst: 12, batch: 'B24-889', exp: '2027-08' }
+            ],
+            selectedPaymentMode: 'UPI',
+            billingItems: []
+        };
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-view').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(el => {
+                el.classList.remove('active-tab');
+                el.classList.add('hover:bg-slate-800', 'hover:text-white');
+            });
+
+            const targetView = document.getElementById(`view-${tabId}`);
+            const targetBtn = document.getElementById(`nav-${tabId}`);
+            if (targetView) targetView.classList.remove('hidden');
+            if (targetBtn) {
+                targetBtn.classList.add('active-tab');
+                targetBtn.classList.remove('hover:bg-slate-800', 'hover:text-white');
+            }
+
+            const titleMap = {
+                dashboard: 'Dashboard Overview',
+                patients: 'Patient Directory (OPD/IPD)',
+                doctors: 'Doctors & OPD Schedule',
+                appointments: 'Appointment Scheduler',
+                beds: 'Bed & Ward Visualizer',
+                billing: 'GST Invoices & Payments',
+                pharmacy: 'Pharmacy & Drug Stock',
+                abha: 'ABHA & PM-JAY Scheme Center'
+            };
+            document.getElementById('current-page-title').innerText = titleMap[tabId] || 'Hospital Management';
+
+            // Tab-specific initializers
+            if (tabId === 'dashboard') renderDashboardView();
+            if (tabId === 'patients') renderPatientsTable();
+            if (tabId === 'doctors') renderDoctorsGrid();
+            if (tabId === 'appointments') renderAppointmentsTable();
+            if (tabId === 'beds') renderBedsGrid();
+            if (tabId === 'pharmacy') renderPharmacyTable();
+            if (tabId === 'billing') initBillingView();
+            if (tabId === 'abha') initABHAView();
+        }
+
+        // DASHBOARD RENDER
+        function renderDashboardView() {
+            const dashTbody = document.getElementById('dash-patient-list');
+            if (dashTbody) {
+                dashTbody.innerHTML = state.patients.slice(0, 5).map(p => `
+                    <tr class="hover:bg-slate-50">
+                        <td class="p-2.5 font-bold text-slate-800">${p.id}</td>
+                        <td class="p-2.5 font-bold text-slate-900">${p.name} (${p.age}/${p.gender[0]})</td>
+                        <td class="p-2.5 text-slate-600">${p.dept}</td>
+                        <td class="p-2.5 text-slate-600">${p.doctor.split(' ')[0]} ${p.doctor.split(' ')[1]}</td>
+                        <td class="p-2.5 text-right"><span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[10px]">${p.type}</span></td>
+                    </tr>
+                `).join('');
+            }
+
+            const wardSummary = document.getElementById('dash-ward-breakdown');
+            if (wardSummary) {
+                const wards = [...new Set(state.beds.map(b => b.ward))];
+                wardSummary.innerHTML = wards.map(w => {
+                    const total = state.beds.filter(b => b.ward === w).length;
+                    const occ = state.beds.filter(b => b.ward === w && b.status === 'occupied').length;
+                    const pct = Math.round((occ / total) * 100);
+                    return `
+                        <div class="space-y-1 text-xs">
+                            <div class="flex justify-between font-semibold">
+                                <span>${w}</span>
+                                <span>${occ} / ${total} Bed Occupied</span>
+                            </div>
+                            <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                                <div class="bg-brand-600 h-2 rounded-full" style="width: ${pct}%"></div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        // PATIENTS RENDER
+        function renderPatientsTable() {
+            const search = document.getElementById('patient-search-input')?.value.toLowerCase() || '';
+            const dept = document.getElementById('patient-filter-dept')?.value || '';
+            const type = document.getElementById('patient-filter-type')?.value || '';
+
+            const tbody = document.getElementById('patients-table-body');
+            if (!tbody) return;
+
+            const filtered = state.patients.filter(p => {
+                const matchSearch = p.name.toLowerCase().includes(search) || p.id.toLowerCase().includes(search) || p.mobile.includes(search);
+                const matchDept = !dept || p.dept === dept;
+                const matchType = !type || p.type === type;
+                return matchSearch && matchDept && matchType;
+            });
+
+            tbody.innerHTML = filtered.map(p => `
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="p-3">
+                        <span class="font-bold text-slate-800">${p.id}</span>
+                        <span class="block text-[10px] text-slate-400">${p.date}</span>
+                    </td>
+                    <td class="p-3">
+                        <span class="font-bold text-slate-900">${p.name}</span>
+                        <span class="block text-[10px] text-slate-500">${p.age} yrs • ${p.gender} • Blood: ${p.blood} • Mobile: ${p.mobile}</span>
+                    </td>
+                    <td class="p-3">
+                        <span class="font-semibold text-slate-800">${p.dept}</span>
+                        <span class="block text-[10px] text-slate-500">${p.doctor}</span>
+                    </td>
+                    <td class="p-3">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${p.scheme.includes('PM-JAY') ? 'bg-orange-100 text-saffron-600' : 'bg-slate-100 text-slate-700'}">${p.scheme}</span>
+                        <span class="block text-[10px] font-mono text-slate-400">${p.abha || 'No ABHA'}</span>
+                    </td>
+                    <td class="p-3 font-semibold text-slate-700">${p.bed}</td>
+                    <td class="p-3 text-right">
+                        <button onclick="quickBillPatient('${p.id}')" class="bg-brand-50 hover:bg-brand-100 text-brand-700 font-bold px-2.5 py-1 rounded text-[11px]">
+                            <i class="fa-solid fa-receipt mr-1"></i> Quick Bill
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // DOCTORS RENDER
+        function renderDoctorsGrid() {
+            const container = document.getElementById('doctors-grid-container');
+            const deptFilter = document.getElementById('doctor-dept-filter')?.value || '';
+            if (!container) return;
+
+            const filtered = state.doctors.filter(d => !deptFilter || d.dept === deptFilter);
+
+            container.innerHTML = filtered.map(d => `
+                <div class="bg-white rounded-xl border border-slate-200/80 shadow-sm p-5 space-y-3 relative">
+                    <div class="flex items-start space-x-3">
+                        <div class="w-12 h-12 rounded-xl bg-brand-50 text-brand-700 font-bold flex items-center justify-center text-lg flex-shrink-0">
+                            <i class="fa-solid fa-user-md"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="font-bold text-slate-900 text-sm truncate">${d.name}</h4>
+                            <p class="text-[11px] text-slate-500 font-medium truncate">${d.qual}</p>
+                            <p class="text-[10px] text-slate-400 font-mono">Reg: ${d.reg}</p>
+                        </div>
+                    </div>
+                    <div class="pt-2 border-t text-xs flex justify-between items-center">
+                        <span class="font-bold text-slate-800">Fee: ₹ ${d.fee}</span>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${d.available ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
+                            ${d.available ? 'Available Today' : 'On Leave'}
+                        </span>
+                    </div>
+                    <button onclick="openBookAppointmentModal('${d.name}')" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2 rounded-lg text-xs transition">
+                        Book OPD Consultation
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // APPOINTMENTS RENDER
+        function renderAppointmentsTable() {
+            const tbody = document.getElementById('appointments-table-body');
+            if (!tbody) return;
+
+            tbody.innerHTML = state.appointments.map(a => `
+                <tr class="hover:bg-slate-50">
+                    <td class="p-3 font-mono font-bold text-slate-800">${a.id}</td>
+                    <td class="p-3 font-bold text-slate-900">${a.patient}</td>
+                    <td class="p-3">
+                        <span class="font-semibold text-slate-800">${a.doctor}</span>
+                        <span class="block text-[10px] text-slate-400">${a.dept}</span>
+                    </td>
+                    <td class="p-3 font-mono text-[11px]">
+                        <div>${a.date}</div>
+                        <div class="text-brand-700 font-bold">${a.slot}</div>
+                    </td>
+                    <td class="p-3 font-mono font-bold">₹ ${a.fee}</td>
+                    <td class="p-3">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${a.status === 'Completed' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${a.status}</span>
+                    </td>
+                    <td class="p-3 text-right">
+                        <button onclick="toggleAppointmentStatus('${a.id}')" class="text-xs text-brand-700 font-bold hover:underline">Toggle Status</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function toggleAppointmentStatus(id) {
+            const app = state.appointments.find(a => a.id === id);
+            if (app) {
+                app.status = app.status === 'Scheduled' ? 'Completed' : 'Scheduled';
+                renderAppointmentsTable();
+            }
+        }
+
+        // BEDS RENDER
+        function renderBedsGrid() {
+            const container = document.getElementById('ward-grid-container');
+            if (!container) return;
+
+            const wards = [...new Set(state.beds.map(b => b.ward))];
+            container.innerHTML = wards.map(wardName => {
+                const wardBeds = state.beds.filter(b => b.ward === wardName);
+                return `
+                    <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-sm space-y-3">
+                        <div class="flex justify-between items-center border-b pb-2">
+                            <h4 class="font-bold text-slate-900 text-sm flex items-center">
+                                <i class="fa-solid fa-hospital-user text-brand-600 mr-2"></i> ${wardName}
+                            </h4>
+                            <span class="text-xs text-slate-500">${wardBeds.filter(b => b.status === 'available').length} / ${wardBeds.length} Available</span>
+                        </div>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                            ${wardBeds.map(bed => {
+                                let badge = 'bg-emerald-50 border-emerald-300 text-emerald-900';
+                                if (bed.status === 'occupied') badge = 'bg-rose-50 border-rose-300 text-rose-900';
+                                if (bed.status === 'maintenance') badge = 'bg-amber-50 border-amber-300 text-amber-900';
+                                return `
+                                    <div class="p-3 border rounded-xl ${badge} space-y-1.5 relative">
+                                        <div class="flex justify-between items-center">
+                                            <span class="font-bold text-xs">${bed.id}</span>
+                                            <i class="fa-solid fa-bed text-xs"></i>
+                                        </div>
+                                        <p class="text-[10px] font-semibold truncate">${bed.patient ? 'Patient: ' + bed.patient : bed.status.toUpperCase()}</p>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // PHARMACY RENDER
+        function renderPharmacyTable() {
+            const tbody = document.getElementById('pharmacy-table-body');
+            if (!tbody) return;
+
+            tbody.innerHTML = state.medicines.map(m => `
+                <tr class="hover:bg-slate-50">
+                    <td class="p-3">
+                        <span class="font-bold text-slate-900">${m.name}</span>
+                        <span class="block text-[10px] text-slate-500">${m.generic}</span>
+                    </td>
+                    <td class="p-3">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${m.schedule.includes('Schedule H') ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'}">${m.schedule}</span>
+                    </td>
+                    <td class="p-3 font-mono text-[11px]">
+                        <div>Batch: ${m.batch}</div>
+                        <div class="text-slate-400">Exp: ${m.exp}</div>
+                    </td>
+                    <td class="p-3 font-bold ${m.stock < 20 ? 'text-rose-600' : 'text-slate-800'}">${m.stock} units</td>
+                    <td class="p-3 font-mono">₹ ${m.price.toFixed(2)}</td>
+                    <td class="p-3 font-mono">${m.gst}%</td>
+                    <td class="p-3 text-right">
+                        <button onclick="addMedToBill('${m.id}')" class="bg-brand-600 hover:bg-brand-700 text-white font-bold px-2.5 py-1 rounded text-[11px]">
+                            <i class="fa-solid fa-cart-plus mr-1"></i> Bill Item
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // BILLING ENGINE
+        function initBillingView() {
+            const select = document.getElementById('billing-patient-select');
+            if (select) {
+                select.innerHTML = state.patients.map(p => `<option value="${p.id}">${p.name} (${p.id}) - ${p.scheme}</option>`).join('');
+            }
+            onBillingPatientChange();
+        }
+
+        function onBillingPatientChange() {
+            state.billingItems = [
+                { name: 'Doctor OPD / IPD Consultation Charges', sac: '999312', qty: 1, rate: 800.00 },
+                { name: 'Hospital Room & Nursing Care', sac: '999311', qty: 1, rate: 1200.00 }
+            ];
+            renderBillingLineItems();
+        }
+
+        function renderBillingLineItems() {
+            const tbody = document.getElementById('billing-items-body');
+            if (!tbody) return;
+
+            tbody.innerHTML = state.billingItems.map((item, idx) => `
+                <tr>
+                    <td class="p-2.5">
+                        <input type="text" value="${item.name}" onchange="updateLineItem(${idx}, 'name', this.value)" class="w-full p-1 border border-slate-200 rounded">
+                    </td>
+                    <td class="p-2.5">
+                        <input type="text" value="${item.sac}" onchange="updateLineItem(${idx}, 'sac', this.value)" class="w-20 p-1 border border-slate-200 rounded font-mono">
+                    </td>
+                    <td class="p-2.5 text-center">
+                        <input type="number" value="${item.qty}" min="1" onchange="updateLineItem(${idx}, 'qty', parseFloat(this.value))" class="w-12 p-1 border border-slate-200 rounded text-center">
+                    </td>
+                    <td class="p-2.5 text-right">
+                        <input type="number" value="${item.rate}" onchange="updateLineItem(${idx}, 'rate', parseFloat(this.value))" class="w-24 p-1 border border-slate-200 rounded text-right font-mono">
+                    </td>
+                    <td class="p-2.5 text-right font-mono font-bold">
+                        ₹ ${(item.qty * item.rate).toFixed(2)}
+                    </td>
+                </tr>
+            `).join('');
+
+            calculateBillingTotals();
+        }
+
+        function addBillingLineItem() {
+            state.billingItems.push({ name: 'Lab Diagnostics / Blood Test', sac: '999316', qty: 1, rate: 500.00 });
+            renderBillingLineItems();
+        }
+
+        function addMedToBill(medId) {
+            const med = state.medicines.find(m => m.id === medId);
+            if (med) {
+                state.billingItems.push({ name: `[Pharmacy] ${med.name}`, sac: '3004', qty: 1, rate: med.price });
+                switchTab('billing');
+                renderBillingLineItems();
+            }
+        }
+
+        function updateLineItem(idx, field, val) {
+            state.billingItems[idx][field] = val;
+            renderBillingLineItems();
+        }
+
+        function calculateBillingTotals() {
+            const gstType = document.getElementById('billing-gst-type')?.value || 'INTRA';
+            let subtotal = state.billingItems.reduce((acc, i) => acc + (i.qty * i.rate), 0);
+
+            let cgst = 0, sgst = 0, igst = 0;
+            if (gstType === 'INTRA') {
+                cgst = subtotal * 0.09;
+                sgst = subtotal * 0.09;
+            } else {
+                igst = subtotal * 0.18;
+            }
+
+            const pid = document.getElementById('billing-patient-select')?.value;
+            const patient = state.patients.find(p => p.id === pid);
+            let subsidy = 0;
+            if (patient && patient.scheme.includes('PM-JAY')) {
+                subsidy = subtotal * 0.50; // 50% Ayushman coverage
+            }
+
+            const grandTotal = subtotal + cgst + sgst + igst - subsidy;
+
+            document.getElementById('bill-subtotal').innerText = `₹ ${subtotal.toFixed(2)}`;
+            document.getElementById('bill-cgst').innerText = `₹ ${cgst.toFixed(2)}`;
+            document.getElementById('bill-sgst').innerText = `₹ ${sgst.toFixed(2)}`;
+            document.getElementById('bill-subsidy').innerText = `- ₹ ${subsidy.toFixed(2)}`;
+            document.getElementById('bill-grandtotal').innerText = `₹ ${grandTotal.toFixed(2)}`;
+        }
+
+        function setPaymentMode(mode) {
+            state.selectedPaymentMode = mode;
+            document.querySelectorAll('.pay-btn').forEach(btn => {
+                btn.classList.remove('border-brand-500', 'bg-brand-50', 'text-brand-700');
+                btn.classList.add('border-slate-200', 'text-slate-600');
+            });
+            const selected = document.getElementById(`paybtn-${mode.toLowerCase()}`);
+            if (selected) {
+                selected.classList.add('border-brand-500', 'bg-brand-50', 'text-brand-700');
+            }
+        }
+
+        function processInvoicePayment() {
+            const amountText = document.getElementById('bill-grandtotal').innerText;
+            if (state.selectedPaymentMode === 'UPI') {
+                document.getElementById('upi-modal-amount').innerText = amountText;
+                document.getElementById('modal-upi-qr').classList.remove('hidden');
+            } else {
+                showPrintableInvoiceModal();
+            }
+        }
+
+        function confirmUPIPaymentSuccess() {
+            closeModal('modal-upi-qr');
+            showPrintableInvoiceModal();
+        }
+
+        function showPrintableInvoiceModal() {
+            const pid = document.getElementById('billing-patient-select')?.value;
+            const patient = state.patients.find(p => p.id === pid) || state.patients[0];
+            const content = document.getElementById('invoice-modal-content');
+
+            let subtotal = state.billingItems.reduce((acc, i) => acc + (i.qty * i.rate), 0);
+            let cgst = subtotal * 0.09;
+            let sgst = subtotal * 0.09;
+            let grandTotal = subtotal + cgst + sgst;
+
+            content.innerHTML = `
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-2 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                        <div>
+                            <span class="text-slate-400 block text-[10px]">PATIENT DETAILS</span>
+                            <p class="font-bold text-slate-800">${patient.name} (${patient.id})</p>
+                            <p class="text-slate-500">Age/Gender: ${patient.age} yrs / ${patient.gender}</p>
+                            <p class="text-slate-500">Mobile: +91 ${patient.mobile}</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-slate-400 block text-[10px]">SCHEME / ABHA</span>
+                            <p class="font-bold text-saffron-600">${patient.scheme}</p>
+                            <p class="text-slate-500 font-mono">${patient.abha || 'N/A'}</p>
+                            <p class="text-slate-500">Payment Mode: ${state.selectedPaymentMode}</p>
+                        </div>
+                    </div>
+
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b text-slate-500 uppercase text-[10px]">
+                                <th class="py-1">Description</th>
+                                <th class="py-1">SAC</th>
+                                <th class="py-1 text-center">Qty</th>
+                                <th class="py-1 text-right">Amount (₹)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            ${state.billingItems.map(i => `
+                                <tr>
+                                    <td class="py-1.5 font-medium text-slate-800">${i.name}</td>
+                                    <td class="py-1.5 font-mono text-slate-500">${i.sac}</td>
+                                    <td class="py-1.5 text-center">${i.qty}</td>
+                                    <td class="py-1.5 text-right font-mono">₹ ${(i.qty * i.rate).toFixed(2)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+
+                    <div class="border-t pt-2 space-y-1 text-right font-mono">
+                        <div>Subtotal: ₹ ${subtotal.toFixed(2)}</div>
+                        <div>CGST (9%): ₹ ${cgst.toFixed(2)}</div>
+                        <div>SGST (9%): ₹ ${sgst.toFixed(2)}</div>
+                        <div class="text-base font-bold text-brand-700">Total Paid: ₹ ${grandTotal.toFixed(2)}</div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('printable-invoice-modal').classList.remove('hidden');
+        }
+
+        // ABHA SIMULATOR
+        function initABHAView() {
+            const select = document.getElementById('pmjay-patient-select');
+            if (select) {
+                select.innerHTML = state.patients.map(p => `<option value="${p.id}">${p.name} - ${p.scheme}</option>`).join('');
+            }
+        }
+
+        function verifyABHANumber() {
+            const val = document.getElementById('abha-verify-input').value;
+            const res = document.getElementById('abha-result-box');
+            if (!val) return alert('Enter ABHA number');
+
+            res.classList.remove('hidden');
+            res.innerHTML = `
+                <div class="flex items-start space-x-2 text-emerald-800 font-bold">
+                    <i class="fa-solid fa-circle-check text-base text-emerald-600 mt-0.5"></i>
+                    <div>
+                        <span>ABHA Verified via ABDM Gateway</span>
+                        <p class="text-[11px] font-normal text-slate-600">Name: Smt. Sunita Sharma • DOB: 12/04/1992</p>
+                        <p class="text-[11px] font-mono text-slate-500">ABHA Address: sunitasharma@abdm • PM-JAY Linked: YES</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function submitPMJAYPreAuth() {
+            alert('PM-JAY Pre-Auth request submitted to NHA Portal. Reference ID: NHA-2026-90812');
+        }
+
+        // MODAL HELPERS
+        function openNewPatientModal() {
+            const deptSelect = document.getElementById('reg-dept');
+            deptSelect.innerHTML = DEPARTMENTS.map(d => `<option value="${d.name}">${d.name}</option>`).join('');
+            updateRegDoctorOptions();
+
+            const availBeds = state.beds.filter(b => b.status === 'available');
+            document.getElementById('reg-bed').innerHTML = availBeds.map(b => `<option value="${b.id}">${b.id} (${b.ward})</option>`).join('');
+
+            document.getElementById('modal-patient-reg').classList.remove('hidden');
+        }
+
+        function openBookAppointmentModal(preselectedDoctor) {
+            const pSelect = document.getElementById('app-patient');
+            pSelect.innerHTML = state.patients.map(p => `<option value="${p.name}">${p.name} (${p.id})</option>`).join('');
+
+            const dSelect = document.getElementById('app-doctor');
+            dSelect.innerHTML = state.doctors.map(d => `<option value="${d.name} (${d.dept})">${d.name} (${d.dept})</option>`).join('');
+
+            if (preselectedDoctor) dSelect.value = preselectedDoctor;
+
+            document.getElementById('app-date').value = new Date().toISOString().split('T')[0];
+            document.getElementById('modal-book-app').classList.remove('hidden');
+        }
+
+        function openDispenseMedModal() {
+            switchTab('pharmacy');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        function updateRegDoctorOptions() {
+            const deptName = document.getElementById('reg-dept').value;
+            const deptObj = DEPARTMENTS.find(d => d.name === deptName);
+            const docSelect = document.getElementById('reg-doctor');
+            if (deptObj) {
+                docSelect.innerHTML = deptObj.doctors.map(doc => `<option value="${doc}">${doc}</option>`).join('');
+            }
+        }
+
+        function toggleBedSelectorInReg() {
+            const type = document.getElementById('reg-type').value;
+            const container = document.getElementById('reg-bed-container');
+            if (type === 'IPD') container.classList.remove('hidden');
+            else container.classList.add('hidden');
+        }
+
+        function handlePatientFormSubmit(e) {
+            e.preventDefault();
+            const type = document.getElementById('reg-type').value;
+            const assignedBed = type === 'IPD' ? document.getElementById('reg-bed').value : '-';
+
+            const newP = {
+                id: `UHID-${Math.floor(1000 + Math.random() * 9000)}`,
+                name: document.getElementById('reg-name').value,
+                mobile: document.getElementById('reg-mobile').value,
+                age: document.getElementById('reg-age').value,
+                gender: document.getElementById('reg-gender').value,
+                blood: document.getElementById('reg-blood').value,
+                type: type,
+                dept: document.getElementById('reg-dept').value,
+                doctor: document.getElementById('reg-doctor').value,
+                scheme: document.getElementById('reg-scheme').value,
+                abha: document.getElementById('reg-abha').value || 'N/A',
+                bed: assignedBed,
+                date: new Date().toISOString().split('T')[0]
+            };
+
+            state.patients.unshift(newP);
+            closeModal('modal-patient-reg');
+            switchTab('patients');
+        }
+
+        function handleAppointmentSubmit(e) {
+            e.preventDefault();
+            const newApp = {
+                id: `APP-${Math.floor(100 + Math.random() * 900)}`,
+                patient: document.getElementById('app-patient').value,
+                doctor: document.getElementById('app-doctor').value,
+                dept: 'Outpatient',
+                date: document.getElementById('app-date').value,
+                slot: document.getElementById('app-slot').value,
+                fee: 800,
+                status: 'Scheduled'
+            };
+            state.appointments.unshift(newApp);
+            closeModal('modal-book-app');
+            switchTab('appointments');
+        }
+
+        function quickBillPatient(id) {
+            switchTab('billing');
+            const select = document.getElementById('billing-patient-select');
+            if (select) {
+                select.value = id;
+                onBillingPatientChange();
+            }
+        }
+
+        // LIVE CLOCK LOGIC
+        setInterval(() => {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-IN', { hour12: true });
+            const dateStr = now.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+            if (document.getElementById('live-time')) document.getElementById('live-time').innerText = timeStr;
+            if (document.getElementById('live-date')) document.getElementById('live-date').innerText = dateStr;
+        }, 1000);
+
+        // INITIAL ONLOAD
+        window.onload = function() {
+            renderDashboardView();
+        };
+    </script>
+</body>
+</html>
